@@ -4,6 +4,11 @@ let
 in
 {
   imports = [
+    ../lib
+    ./configs.nix
+    ./home.nix
+    ./packages.nix
+    ./tests.nix
     inputs.flake-parts.flakeModules.partitions
   ];
 
@@ -13,6 +18,7 @@ in
   };
 
   partitionedAttrs = lib.genAttrs [
+    "checks"
     "devShells"
     "formatter"
   ] (_: "dev");

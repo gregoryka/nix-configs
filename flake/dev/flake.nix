@@ -9,6 +9,17 @@
     };
 
     nixpkgs.follows = "root/nixpkgs";
+    flake-parts.follows = "root/flake-parts";
+    home-manager.follows = "root/home-manager";
+    nix-darwin.follows = "root/nix-darwin";
+    nur.follows = "root/nur";
+    sops-nix.follows = "root/sops-nix";
+
+    nix-unit = {
+      url = "github:nix-community/nix-unit";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
 
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";

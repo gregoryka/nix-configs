@@ -1,0 +1,22 @@
+keys:
+  - &gregory_m4_pro_mac age1tagpq1njn9ruvth6anxg9z4vasq7a83mfqswym302jwh2lax2wtf423acycnd2saplg266gsnj6unfw2x2wp0593dyyfdndjtv23drqjntr75m3jktdppcav2j4gyn3fghl3xxnjsded69kfmtkuzucj5e3qfh3spzwqhqq09p4qnpqj54rtutx328tqdh7uy95uja5sdmt6aqgamzf0dtcjkqtjy9zt4zcchhr0jpeg4a32l9sjpfqnwrfnfuygjm2jpxrnzxdsd4jcz2we09j3gfhzck4jdfc4pdz2djq0l9wtf54sh9v23rmaguhcgn37hqzhrwkllpvfma4j9c2jvgp4cjj8x5ndwgxqqdwd9vgetky5rpsqglq05q4j5pp73amfeud5zpk2t0nqn5c3z9myuzvge5hh7crl0pgwqs6rppz9e0c7fzs7qry9hw305z9vczhau3ufajeexm3a89yr3sv8xejd24hhg8wymrqcs9s3jjnddrx5t2uyx2869k0pv85slapdj6wp3k2xzyttgkgelps93f0jwxe8q2ewqkfatp0mhtdqrm6p3xyydq9vq625t6nh7pn9ec5wm2cjv8h3vcckkvjtgqvn2vc7p00vp0k43ygsu49myazduyqsl5s4wv3dyhf792dccfpynq5vzmxg6g0xz479mq25puxpd9z8ytrat246e8dm7urgcvczl2fwtpngd779yxey75j2uwfwu2p9pf3tr5ce2jqpc6w4c58durufyr4a54gwf4emzyvsdhjhps0q0ydey4p2zvggfegpn9z3q0uwpjunyaed4gwtspgl03ys66cput4u4fldjkw9esyyku55zdd32d9fa997shf9fryep6zh92qzfas32pjpmffkeheqafv6qy4xh7fw7zgcy6aq4t00zg0dllz52j5w2xhly2mlmxer92r2dfwfnhcgrl5j3en5nncqsg4p5t83y70dajt3922m06crws2h9suyzwvvaaryt95989w3ycgrxffrqszydf0n5xqs7erz8nr0xqcsqzykruzq4gmcvjcuyw3dyzu32nkkpcj66cyxfqq9yq08eywxdrrdjsw0ztacshp3rs5p5x5yawrw6ff93fzl54trs8psk6qqwtl5y23wm3g77r808xcuhekjmcda5lv9kpmqffgh5gyzdq0skh3wrgef584nsn90gzpspn909axlqxk5cnekzj3903q2z82wfl02et4n2599ey5sxhxxk43ve3k25g0fvy85qggez3vnqhfx7snk7p6ga3egtqetsken4e5jeswd6mnft6jrz8xa2s4t3cc9wm32958kehctt5t7wmtpy46k62cquv32jyj782v42rsrn6k2mwdup9fkszm7mf3y4549h4dggs92mhrlgru3qtzrk3zsks3ge7s9x297jnkenj9lzvgtde5my9fw2x6twfxna8ethdy43t7dep0z5z2lg27qe3nn53xmx7g325wtp90x9n9svgcdyrxkaec7f3gws8d93zzqzkn5jekr36v7mvp4msyem2sjlpq4tmd0gg8q2a0szrcagc88hydy65zru9kjyda7scceghpdhyf6uc2ruudjcrkya0afdpxfu6gnpy02fslvw5rxy7ckut0y8zz4jy2wwmqy0fegg4e3n37yw924dqqrk5q3lfvw540xaum2tyn54ge3lju4ujx3439yara4az8w5pp0yuc7gazcckh3k2tkdrhhdk8tlxmvmrwkkqjmgf6k99t69lpjr46gp5rxycj5dvv76zhtfgvmg8y56qjeccsdsn5yn4k05dqa4kj93af5tmpmzlua6kh2ewsnqv5838xyvlpdfug5m0yl7uxxfslxzmh3sy5sypzxpt4vkktk6hn3mx4vuf04038h43cte2ct7n4pm00rs080chavekcxlyyt6wxq5lc2r9r653un0mz8tljrv7c9qgpc332wzdreqjwj33d
+creation_rules:
+  # Work: gregory-m4-pro-mac can decrypt everything under secrets/work/,
+  # including host-specific subdirectories (e.g. linux-build24's own
+  # secrets) -- the dev VM's key is only ever added to its own
+  # subdirectory rule below, so its access is a strict subset of the
+  # Mac's.
+  - path_regex: secrets/work/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *gregory_m4_pro_mac
+  - path_regex: secrets/work/linux-build24/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *gregory_m4_pro_mac
+          # - *linux_build24 (add once its age key is generated)
+
+  # Personal: no personal machine keys exist yet. Add a
+  # secrets/personal/[^/]+\.(yaml|json|env|ini)$ rule (with its own
+  # key_group, deliberately excluding every *_work_* key above) once the
+  # first personal machine is added to the flake.
