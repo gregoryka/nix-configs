@@ -32,6 +32,19 @@ in
       # out of the box, to avoid incorrect precedence over our own zshrc.
       envExtra = mkIf (!hasSystemZsh) ''
         setopt no_global_rcs
+
+        # Unlike bash, zsh never sources /etc/profile or /etc/profile.d/*.sh
+        # (that's a bash/sh login convention, not a zsh one). On non-NixOS
+        # hosts, that's normally where a multi-user Nix install's own
+        # PATH/NIX_PATH setup lives, so without this, no nix-installed
+        # executable is found once zsh (rather than bash) is the login
+        # shell -- source it explicitly, covering common installer layouts.
+        for __nix_profile_script in /etc/profile.d/nix.sh /etc/profile.d/nix-daemon.sh "$HOME/.nix-profile/etc/profile.d/nix.sh"; do
+          if [[ -e "$__nix_profile_script" ]]; then
+            emulate sh -c "source '$__nix_profile_script'"
+          fi
+        done
+        unset __nix_profile_script
       '';
 
       history = mkIf (!config.gregnix.programs.terminal.tools.atuin.enable) {

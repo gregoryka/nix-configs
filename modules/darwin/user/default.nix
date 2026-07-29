@@ -25,5 +25,12 @@ in
       shell = pkgs.zsh;
       home = "/Users/${cfg.name}";
     };
+
+    # Explicit, matching the login shell set above -- true is already
+    # nix-darwin's own default, but relying on that silently would make
+    # `hasSystemZsh` in the home-manager zsh module (which reads this same
+    # option through osConfig) depend on an upstream default nobody here
+    # would notice changing.
+    programs.zsh.enable = true;
   };
 }

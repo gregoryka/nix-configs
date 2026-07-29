@@ -29,3 +29,22 @@ errors unless one of the following is done first:
   subsequent rebuild works normally, since by then
   `security.pki.certificateFiles` has already merged trust into
   `/etc/ssl/certs/ca-certificates.crt` and pointed `NIX_SSL_CERT_FILE` at it.
+
+## First-time activation on a standalone Linux host (e.g. a dev VM)
+
+Standalone `home-manager` (no NixOS underneath) never touches `/etc/passwd`,
+so switching the login shell to the Nix-managed `zsh` is a one-time manual
+step after the first `home-manager switch --flake .#<name>`:
+
+```sh
+# Use the ~/.nix-profile symlink, not its resolved store path -- the
+# symlink target changes on every zsh update/generation switch, but the
+# symlink itself is stable, so /etc/shells and `chsh` never need to be
+# redone afterwards.
+NIX_ZSH="$HOME/.nix-profile/bin/zsh"
+grep -qxF "$NIX_ZSH" /etc/shells || echo "$NIX_ZSH" | sudo tee -a /etc/shells
+chsh -s "$NIX_ZSH"
+```
+
+Log out and back in (or start a fresh login shell) afterwards for the change
+to take effect.
