@@ -1,5 +1,7 @@
 _: {
   gregnix = {
+    archetypes.work.enable = true;
+
     user = {
       enable = true;
       name = "user";
