@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  hostname,
 
   ...
 }:
@@ -9,7 +10,8 @@ let
 
   cfg = config.gregnix.archetypes.work;
 
-  awsSecretsFile = getFile "secrets/work/linux-build24/aws.yaml";
+  awsSecretsFile = getFile "secrets/work/aws.yaml";
+  artifactorySecretsFile = getFile "secrets/work/${hostname}/artifactory.yaml";
 in
 {
   options.gregnix.archetypes.work = {
@@ -39,6 +41,11 @@ in
       sso_account_id.sopsFile = awsSecretsFile;
       sso_start_url.sopsFile = awsSecretsFile;
       sso_role_name.sopsFile = awsSecretsFile;
+      artifactory_token = {
+        sopsFile = artifactorySecretsFile;
+        # Pinned to a fixed, known path so devShells can read it directly.
+        path = "${config.home.homeDirectory}/.local/state/sops-nix/artifactory_token";
+      };
     };
   };
 }

@@ -28,6 +28,10 @@ let
     cargo
     rust-cbindgen
   ];
+
+  # Matches the fixed path set in modules/home/archetypes/work/default.nix's
+  # `sops.secrets.artifactory_token.path`.
+  artifactoryTokenPath = "$HOME/.local/state/sops-nix/artifactory_token";
 in
 pkgs.mkShellNoCC {
   inherit packages;
@@ -41,5 +45,13 @@ pkgs.mkShellNoCC {
     ) packages}
     echo ""
     echo "💡 C/C++ (clang 22 + libstdc++15) and Rust toolchain for S1"
+
+    if [[ -f "${artifactoryTokenPath}" ]]; then
+      ART_TOKEN="$(cat "${artifactoryTokenPath}")"
+      export ART_TOKEN
+      echo "🔑 ART_TOKEN loaded"
+    else
+      echo "⚠️  No artifactory token at ${artifactoryTokenPath} (run 'home-manager switch' first)"
+    fi
   '';
 }
