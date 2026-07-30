@@ -4,10 +4,21 @@
   ...
 }:
 let
+  # nixpkgs does not expose versioned `clang-22`/`clang++-22`/`llvm-ar-22`
+  # binaries directly, so alias them ourselves for convenience.
+  versionedLlvmTools = pkgs.runCommand "s1-versioned-llvm-tools" { } ''
+    mkdir -p "$out/bin"
+    ln -s "${pkgs.clang_22}/bin/clang" "$out/bin/clang-22"
+    ln -s "${pkgs.clang_22}/bin/clang++" "$out/bin/clang++-22"
+    ln -s "${pkgs.llvmPackages_22.llvm}/bin/llvm-ar" "$out/bin/llvm-ar-22"
+  '';
+
   packages = with pkgs; [
     clang_22
+    llvmPackages_22.llvm
     llvmPackages_22.clang-tools # clangd, clang-tidy, clang-format
     gcc15.cc.lib # libstdc++15
+    versionedLlvmTools
     uncrustify
     sccache
     meson
