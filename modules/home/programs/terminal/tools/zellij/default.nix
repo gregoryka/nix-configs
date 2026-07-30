@@ -19,9 +19,15 @@ in
       package = pkgs.zellij;
 
       settings = {
-        copy_command = if pkgs.stdenv.hostPlatform.isDarwin then "pbcopy" else "wl-copy";
         default_mode = "locked";
         pane_frames = true;
+      }
+      # On Linux, leave copy_command unset so zellij falls back to OSC52
+      # clipboard escape sequences -- these are forwarded through SSH to
+      # the local terminal, unlike `wl-copy`, which requires a running
+      # Wayland session and silently does nothing over SSH.
+      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+        copy_command = "pbcopy";
       };
     };
   };

@@ -21,22 +21,33 @@ let
     versionedLlvmTools
     uncrustify
     sccache
+    popt
     meson
     ninja
     gnumake
     rustc
     cargo
+    clippy
+    rustfmt
     rust-cbindgen
+    rust-bindgen
   ];
 
   # Matches the fixed path set in modules/home/archetypes/work/default.nix's
   # `sops.secrets.artifactory_token.path`.
   artifactoryTokenPath = "$HOME/.local/state/sops-nix/artifactory_token";
+
+  # clang_22's default hardening flags, minus fortify/fortify3.
+  hardeningFlags = lib.concatStringsSep " " (
+    lib.subtractLists [ "fortify" "fortify3" ] pkgs.clang_22.defaultHardeningFlags
+  );
 in
 pkgs.mkShellNoCC {
   inherit packages;
 
   shellHook = ''
+    export NIX_HARDENING_ENABLE="${hardeningFlags}"
+
     echo "⚙️  S1 DevShell"
     echo ""
     echo "📦 Available packages:"
