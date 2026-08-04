@@ -1,0 +1,17 @@
+# Extends gitleaks' built-in default ruleset (private keys, API tokens,
+# high-entropy secrets, etc.) with project-specific rules.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "email-address"
+description = "Email address"
+regex = '''[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'''
+tags = ["pii", "email"]
+
+[allowlist]
+description = "Known-safe placeholders and noreply addresses that aren't real personal emails"
+regexes = [
+  '''noreply\.github\.com''',
+  '''@example\.com''',
+]

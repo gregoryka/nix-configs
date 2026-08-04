@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ...
@@ -15,6 +16,8 @@ pkgs.mkShellNoCC {
   inherit packages;
 
   shellHook = ''
+    ${config.pre-commit.installationScript}
+
     echo "🚀 GregNix development environment"
     echo ""
     echo "📦 Available packages:"

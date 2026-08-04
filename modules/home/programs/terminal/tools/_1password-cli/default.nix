@@ -5,7 +5,12 @@
   ...
 }:
 let
-  inherit (lib) mkIf mkEnableOption mkOption types;
+  inherit (lib)
+    mkIf
+    mkEnableOption
+    mkOption
+    types
+    ;
 
   cfg = config.gregnix.programs.terminal.tools._1password-cli;
 in

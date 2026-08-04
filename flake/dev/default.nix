@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    ./checks.nix
     ./devshells.nix
     ./tests.nix
     ./treefmt.nix
