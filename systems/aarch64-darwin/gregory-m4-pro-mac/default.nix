@@ -2,18 +2,9 @@
   gregnix.nix.useLix = true;
   gregnix.system.fonts.enable = true;
   gregnix.archetypes.work.enable = true;
+  gregnix.programs.graphical.apps._1password.enable = true;
 
-  # Personal utilities that were already installed via Homebrew manually on
-  # this machine, before `homebrew.onActivation.cleanup` (previously
-  # "uninstall") started removing anything not declared here. Declaring them
-  # keeps them tracked instead of removed. All four auto-update themselves in
-  # place, same as `claude` in the work archetype, so greedy is off for the
-  # same reason (see modules/darwin/tools/homebrew).
   homebrew.casks = [
-    {
-      name = "1password";
-      greedy = false;
-    }
     {
       name = "alt-tab";
       greedy = false;

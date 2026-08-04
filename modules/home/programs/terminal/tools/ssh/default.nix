@@ -90,7 +90,17 @@ in
     }
 
     (mkIf (cfg.authorizedKeys != [ ]) {
-      home.file.".ssh/authorized_keys".text = concatStringsSep "\n" cfg.authorizedKeys;
+      # Deliberately NOT `home.file`: that symlinks into the Nix store, and
+      # sshd's StrictModes then refuses the key ("bad ownership or modes for
+      # directory /nix/store", since the store is group-writable) -- silently
+      # falling back to password auth. Materialize a real, plain file instead.
+      home.activation.installAuthorizedKeys = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        run install -d -m700 "$HOME/.ssh"
+        cat > "$HOME/.ssh/authorized_keys" <<'EOF'
+        ${concatStringsSep "\n" cfg.authorizedKeys}
+        EOF
+        run chmod 600 "$HOME/.ssh/authorized_keys"
+      '';
     })
   ]);
 }

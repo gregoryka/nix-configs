@@ -23,9 +23,11 @@ _: {
         ripgrep.enable = true;
         ssh = {
           enable = true;
-          # Secretive-backed key on the Mac, allowed to log in as this user.
           authorizedKeys = [
-            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNvjAYGyZOYFlgQwhBtqiYdEBCQb2pZ6pu9ox5RS6F5EToy6e0+pFVJVWYJhCFP2e2pdF/vslKfFA/pDVYzPPW0="
+            # Secretive-backed key on the Mac, allowed to log in as this user.
+            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJFdl9FOAgLXOpRupIEvaowKVQjG4ScYK7v2j+lW19RILGHamIhnsNQP0CRhWG5lKrcYV4KjQ4ezjQ9a+rcnTok="
+            # 1Password stored ssh key, for backup access
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPP5CGim0pS4RQLjTrMC8OaI1aO5n7H8Ajuy/mf+F1VX"
           ];
         };
         starship.enable = true;

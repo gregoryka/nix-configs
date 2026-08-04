@@ -15,15 +15,16 @@ in
   config = lib.mkIf cfg.enable {
     gregnix.tools.homebrew.enable = true;
 
-    # `claude` has a real (non-`:latest`) pinned version in its cask recipe,
-    # so `greedy: false` doesn't exempt it from `brew outdated` the way it
-    # does for genuine `version :latest` casks -- it still shows up as
-    # outdated whenever the recipe bumps, and `brew bundle install` upgrades
-    # outdated deps by default. But the app self-updates in place outside
-    # Homebrew's bookkeeping, so that upgrade attempt always fails
-    # ("It seems there is already an App at ..."). Skip it from `brew
-    # bundle`'s install/upgrade cycle entirely; it's already installed and
-    # keeps itself current.
+    # `claude`'s cask has `auto_updates: true` (confirmed via `brew info
+    # --cask claude`) -- normally that alone would
+    # make `brew outdated`/`upgrade --cask` skip it, the same way `greedy:
+    # false` does for other auto-updating casks elsewhere in this repo (see
+    # gregnix.programs.graphical.apps._1password). But the app self-updates
+    # in place outside Homebrew's own Cellar/metadata tracking, so `brew
+    # bundle install` still fails trying to (re)install/upgrade it ("It
+    # seems there is already an App at ..."). Skip it from `brew bundle`'s
+    # install/upgrade cycle entirely; it's already installed and keeps
+    # itself current.
     #
     # Must go through `homebrew.onActivation.extraEnv` (rendered straight
     # into the `brew bundle` invocation nix-darwin runs during activation),

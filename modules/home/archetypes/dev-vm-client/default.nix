@@ -17,6 +17,11 @@ let
   # container path under the user's home directory (keyed by bundle ID).
   secretiveSocket = "${config.home.homeDirectory}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";
   secretiveForwardedSocket = "/run/user/1000/secretive.ssh";
+
+  # Used only for the "-claude" Host aliases below: Claude Desktop's embedded
+  # ssh2 client eagerly parses `IdentityFile` as private key material and
+  # crashes on a public key file, so those aliases must be agent-only.
+  onePasswordSocket = config.gregnix.programs.terminal.tools._1password-cli.sshSocket;
 in
 {
   options.gregnix.archetypes.devVmClient = {
@@ -61,6 +66,13 @@ in
             IdentityAgent ${secretiveSocket}
             IdentityFile ${cfg.identityFile}
             RemoteForward ${secretiveForwardedSocket} ${secretiveSocket}
+
+
+          Host ${name}-claude
+            HostName ${vm.host}
+            User user
+            IdentityAgent "${onePasswordSocket}"
+            RemoteForward ${secretiveForwardedSocket} "${onePasswordSocket}"
         '') cfg.vms
       );
     };

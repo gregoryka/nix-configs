@@ -9,7 +9,7 @@
     archetypes.work.enable = true;
     archetypes.devVmClient = {
       enable = true;
-      identityFile = "${config.home.homeDirectory}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/PublicKeys/722304a0df9f4a4b0661c7c97be1b786.pub";
+      identityFile = "${config.home.homeDirectory}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/PublicKeys/2a0de6597331ac28668b1280985bad10.pub";
       vms."dev-vm" = {
         host = config.sops.placeholder.dev_vm_ip;
         hostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILDnMt0VZYFyjEgXGpErGwT0VSJ4wZ90tbmW9IVaUxKQ";
