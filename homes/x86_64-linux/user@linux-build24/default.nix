@@ -21,6 +21,13 @@ _: {
         lazygit.enable = true;
         nh.enable = true;
         ripgrep.enable = true;
+        ssh = {
+          enable = true;
+          # Secretive-backed key on the Mac, allowed to log in as this user.
+          authorizedKeys = [
+            "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNvjAYGyZOYFlgQwhBtqiYdEBCQb2pZ6pu9ox5RS6F5EToy6e0+pFVJVWYJhCFP2e2pdF/vslKfFA/pDVYzPPW0="
+          ];
+        };
         starship.enable = true;
         yazi.enable = true;
         zellij.enable = true;

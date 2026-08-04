@@ -1,6 +1,20 @@
-_: {
+{
+  config,
+  lib,
+
+  ...
+}:
+{
   gregnix = {
     archetypes.work.enable = true;
+    archetypes.devVmClient = {
+      enable = true;
+      identityFile = "${config.home.homeDirectory}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/PublicKeys/722304a0df9f4a4b0661c7c97be1b786.pub";
+      vms."dev-vm" = {
+        host = config.sops.placeholder.dev_vm_ip;
+        hostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILDnMt0VZYFyjEgXGpErGwT0VSJ4wZ90tbmW9IVaUxKQ";
+      };
+    };
 
     user = {
       enable = true;
@@ -21,6 +35,7 @@ _: {
         lazygit.enable = true;
         nh.enable = true;
         ripgrep.enable = true;
+        ssh.enable = true;
         starship.enable = true;
         yazi.enable = true;
         zellij.enable = true;
@@ -32,6 +47,8 @@ _: {
 
     system.xdg.enable = true;
   };
+
+  sops.secrets.dev_vm_ip.sopsFile = lib.getFile "secrets/work/gregory-m4-pro-mac/ssh.yaml";
 
   home.stateVersion = "26.05";
 }
