@@ -1,8 +1,13 @@
 { inputs, lib, ... }:
 {
   perSystem =
-    { pkgs, ... }:
+    { system, ... }:
     let
+      pkgs = import inputs.nixpkgs {
+        inherit system;
+        config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" ];
+      };
+
       packageFunctions = lib.filesystem.packagesFromDirectoryRecursive {
         directory = ../packages;
         callPackage = file: _args: import file;

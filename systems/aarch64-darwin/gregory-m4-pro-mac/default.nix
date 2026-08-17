@@ -3,6 +3,16 @@
   gregnix.system.fonts.enable = true;
   gregnix.archetypes.work.enable = true;
   gregnix.programs.graphical.apps._1password.enable = true;
+  gregnix.programs.graphical.apps.vicinae.enable = true;
+  gregnix.programs.graphical.apps.devin.enable = true;
+  gregnix.programs.graphical.apps.karabiner-elements.enable = true;
+  gregnix.programs.graphical.apps.utm.enable = true;
+  gregnix.programs.graphical.apps.keepingyouawake.enable = true;
+  gregnix.programs.graphical.apps.middleclick.enable = true;
+  gregnix.programs.graphical.apps.secretive.enable = true;
+  gregnix.programs.graphical.apps.podman-desktop.enable = true;
+  gregnix.programs.graphical.apps.kitty.enable = true;
+  gregnix.programs.graphical.apps.ghostty.enable = true;
 
   homebrew.casks = [
     {

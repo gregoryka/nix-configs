@@ -13,7 +13,9 @@ let
 
   awsSecretsFile = getFile "secrets/work/aws.yaml";
   artifactorySecretsFile = getFile "secrets/work/${hostname}/artifactory.yaml";
+  artifactorySharedSecretsFile = getFile "secrets/work/artifactory.yaml";
   gitSecretsFile = getFile "secrets/work/git.yaml";
+  userSecretsFile = getFile "secrets/work/user.yaml";
 
   githubSigningKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBdm9VQQSYhCdagTzOpOwtHZXzrz24vhelbi9IUbmJ3qc/OjwdEysOm0+O5xjwPdselTgTb5jAudlyfaay4TIvo=";
   githubEmail = "247164767+gregory-kanter-s1@users.noreply.github.com";
@@ -57,7 +59,7 @@ in
       };
       ghe = {
         remotes = [ config.sops.placeholder.ghe_domain ];
-        email = config.sops.placeholder.ghe_email;
+        email = config.sops.placeholder.email;
         signingKey = gheSigningKey;
       };
     };
@@ -65,6 +67,11 @@ in
     gregnix.programs.terminal.tools.ssh.extraKnownHosts = map (
       key: "${config.sops.placeholder.ghe_domain} ${key}"
     ) gheHostKeys;
+
+    gregnix.programs.terminal.tools.npm = {
+      enable = true;
+      hostPath = config.sops.placeholder.artifactory_npm_registry;
+    };
 
     programs.git.settings.gpg.ssh.program =
       "${pkgs.gregnix.git-ssh-keygen-secretive}/bin/git-ssh-keygen-secretive";
@@ -78,8 +85,9 @@ in
         # Pinned to a fixed, known path so devShells can read it directly.
         path = "${config.home.homeDirectory}/.local/state/sops-nix/artifactory_token";
       };
-      ghe_email.sopsFile = gitSecretsFile;
+      artifactory_npm_registry.sopsFile = artifactorySharedSecretsFile;
       ghe_domain.sopsFile = gitSecretsFile;
+      email.sopsFile = userSecretsFile;
     };
   };
 }

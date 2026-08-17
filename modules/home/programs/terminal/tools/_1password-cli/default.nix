@@ -42,5 +42,9 @@ in
     programs.ssh.settings."*" = mkIf cfg.enableSshSocket {
       IdentityAgent = cfg.sshSocket;
     };
+
+    programs.zsh.initContent = mkIf config.programs.zsh.enable ''
+      eval "$(op completion zsh)"
+    '';
   };
 }

@@ -21,16 +21,18 @@ let
   # Used only for the "-claude" Host aliases below: Claude Desktop's embedded
   # ssh2 client eagerly parses `IdentityFile` as private key material and
   # crashes on a public key file, so those aliases must be agent-only.
+  # Upstream bug: https://github.com/anthropics/claude-code/issues/29717#issuecomment-4321921990
   onePasswordSocket = config.gregnix.programs.terminal.tools._1password-cli.sshSocket;
+
+  identityFileName = "dev-vm.pub";
 in
 {
   options.gregnix.archetypes.devVmClient = {
     enable = lib.mkEnableOption "this Mac's ssh/signing setup for connecting to dev VMs";
 
-    identityFile = mkOpt lib.types.str "" ''
-      Path to this specific machine's Secretive-exported public key
-      (Secure Enclave-backed, non-transferable to any other machine) used
-      to authenticate to dev VMs.
+    identityPublicKey = mkOpt lib.types.str "" ''
+      This specific machine's public key contents used
+      to authenticate to the machine.
     '';
 
     vms =
@@ -58,13 +60,17 @@ in
     gregnix.programs.terminal.tools.ssh = {
       extraKnownHosts = mapAttrsToList (_name: vm: "${vm.host} ${vm.hostKey}") cfg.vms;
 
+      identityFiles = lib.optionalAttrs (cfg.identityPublicKey != "") {
+        ${identityFileName} = cfg.identityPublicKey;
+      };
+
       extraConfig = concatStringsSep "\n" (
         mapAttrsToList (name: vm: ''
           Host ${name}
             HostName ${vm.host}
             User user
             IdentityAgent ${secretiveSocket}
-            IdentityFile ${cfg.identityFile}
+            IdentityFile ${config.xdg.configHome}/ssh/${identityFileName}
             RemoteForward ${secretiveForwardedSocket} ${secretiveSocket}
 
 

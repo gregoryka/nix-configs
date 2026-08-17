@@ -11,6 +11,8 @@ let
     mkIf
     mkMerge
     concatStringsSep
+    mapAttrs'
+    nameValuePair
     ;
   inherit (lib.gregnix) mkOpt;
 
@@ -38,6 +40,13 @@ in
       Extra `known_hosts` lines, in addition to the built-in ones, rendered
       via sops so entries containing a `sops.placeholder` (e.g. a sensitive
       hostname) don't land in the plaintext Nix store.
+    '';
+
+    identityFiles = mkOpt (types.attrsOf types.str) { } ''
+      Public key contents (not secret) to materialize at
+      `$XDG_CONFIG_HOME/ssh/<name>`, keyed by filename, so an
+      `IdentityFile` directive elsewhere can point at a stable path
+      instead of e.g. an app sandbox container path directly.
     '';
   };
 
@@ -88,6 +97,12 @@ in
         ".ssh/controlmasters/.keep".text = "";
       };
     }
+
+    (mkIf (cfg.identityFiles != { }) {
+      xdg.configFile = mapAttrs' (
+        name: content: nameValuePair "ssh/${name}" { text = content; }
+      ) cfg.identityFiles;
+    })
 
     (mkIf (cfg.authorizedKeys != [ ]) {
       # Deliberately NOT `home.file`: that symlinks into the Nix store, and

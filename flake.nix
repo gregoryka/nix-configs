@@ -23,6 +23,11 @@
     };
 
     nur.url = "github:nix-community/NUR";
+
+    vicinae = {
+      url = "github:vicinaehq/vicinae";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
