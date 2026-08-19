@@ -5,7 +5,12 @@
     let
       pkgs = import inputs.nixpkgs {
         inherit system;
-        config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" ];
+        config.allowUnfreePredicate =
+          pkg:
+          builtins.elem (lib.getName pkg) [
+            "1password-cli"
+            "qodo-cli"
+          ];
       };
 
       packageFunctions = lib.filesystem.packagesFromDirectoryRecursive {
