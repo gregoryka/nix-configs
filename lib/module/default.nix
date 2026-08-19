@@ -110,6 +110,85 @@ rec {
   mkBoolOpt = mkOpt types.bool;
 
   /**
+    Generic ARCHITECTURE.md-compliant secrets injection: wraps an existing
+    executable so that, at invocation time (never at build time), named
+    environment variables are populated either by re-execing once through
+    `op run` against a 1Password reference (primary, for CLI tools) or by
+    decrypting a sops field fresh on every invocation (fallback: "runtime
+    SOPS decryption with Nix managing the wrapper", for hosts without
+    1Password). Both mechanisms only ever expose the *resolved* value to
+    the wrapped process's environment -- never to disk or the Nix store;
+    the op:// references and sops file paths baked into the script are
+    pointers, not secrets. Takes `pkgs` explicitly (for
+    `writeShellApplication`/`sops`) since this file is pure `lib`, with no
+    instantiated `pkgs` of its own.
+
+    # Inputs
+
+    `pkgs`
+    : nixpkgs instance, for `writeShellApplication` and `sops`.
+
+    `executable`
+    : The real executable to wrap, e.g. `lib.getExe somePackage`.
+
+    `name`
+    : Name for the resulting wrapper (usually matching the wrapped program).
+
+    `opEnv`
+    : attrsOf str -- ENV_VAR -> op:// reference, injected via a single
+      `op run` re-exec. Defaults to `{ }`.
+
+    `sopsEnv`
+    : attrsOf `{ sopsFile :: path; key :: str; }` -- ENV_VAR -> sops
+      field, decrypted fresh on every invocation via
+      `sops decrypt --extract`. Defaults to `{ }`.
+  */
+  mkSecretsWrapper =
+    {
+      pkgs,
+      executable,
+      name,
+      opEnv ? { },
+      sopsEnv ? { },
+    }:
+    let
+      opRunArgs = lib.concatStringsSep " " (
+        lib.mapAttrsToList (envVar: ref: ''"${envVar}=${ref}"'') opEnv
+      );
+
+      sopsExports = lib.concatStrings (
+        lib.mapAttrsToList (envVar: secret: ''
+          ${envVar}="$(sops decrypt --extract '["${secret.key}"]' "${secret.sopsFile}")"
+          export ${envVar}
+        '') sopsEnv
+      );
+    in
+    pkgs.writeShellApplication {
+      inherit name;
+      runtimeInputs = lib.optional (sopsEnv != { }) pkgs.sops;
+      text =
+        lib.optionalString (opEnv != { }) ''
+          # 1Password (ARCHITECTURE.md primary for CLI tools): re-exec once
+          # through `op run`, which resolves each op:// reference below to
+          # its real value and injects it only into this process's
+          # environment.
+          if [[ -z "''${_OP_RUN_ACTIVE:-}" ]]; then
+            export _OP_RUN_ACTIVE=1
+            exec env ${opRunArgs} op run --no-masking -- "$0" "$@"
+          fi
+        ''
+        + lib.optionalString (sopsEnv != { }) ''
+          # ARCHITECTURE.md fallback (1Password unavailable): runtime sops
+          # decryption with Nix managing the wrapper.
+          ${sopsExports}
+        ''
+        + ''
+          exec "${executable}" "$@"
+        '';
+      meta.mainProgram = name;
+    };
+
+  /**
     Create a boolean nixpkgs option without a description.
 
     # Inputs

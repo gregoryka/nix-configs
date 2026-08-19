@@ -16,6 +16,7 @@ let
   artifactorySharedSecretsFile = getFile "secrets/work/artifactory.yaml";
   gitSecretsFile = getFile "secrets/work/git.yaml";
   userSecretsFile = getFile "secrets/work/user.yaml";
+  qodoSecretsFile = getFile "secrets/work/qodo.yaml";
 
   githubSigningKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBdm9VQQSYhCdagTzOpOwtHZXzrz24vhelbi9IUbmJ3qc/OjwdEysOm0+O5xjwPdselTgTb5jAudlyfaay4TIvo=";
   githubEmail = "247164767+gregory-kanter-s1@users.noreply.github.com";
@@ -72,6 +73,14 @@ in
       enable = true;
       hostPath = config.sops.placeholder.artifactory_npm_registry;
     };
+
+    gregnix.programs.terminal.tools.qodo = {
+      enable = false;
+      urlSopsFile = qodoSecretsFile;
+      tokenRef = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin "op://Employee/global-qodo-cli-key/credential";
+    };
+    gregnix.programs.terminal.tools.claude-code.enable = true;
+    gregnix.programs.terminal.tools.devin.enable = true;
 
     programs.git.settings.gpg.ssh.program =
       "${pkgs.gregnix.git-ssh-keygen-secretive}/bin/git-ssh-keygen-secretive";

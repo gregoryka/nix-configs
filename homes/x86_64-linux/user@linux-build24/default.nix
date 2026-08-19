@@ -1,4 +1,5 @@
-_: {
+{ lib, ... }:
+{
   gregnix = {
     archetypes.work.enable = true;
 
@@ -31,9 +32,12 @@ _: {
           ];
         };
         starship.enable = true;
+        terminfo.enable = true;
         yazi.enable = true;
         zellij.enable = true;
         zoxide.enable = true;
+
+        qodo.tokenSopsFile = lib.getFile "secrets/work/linux-build24/qodo.yaml";
       };
     };
 
