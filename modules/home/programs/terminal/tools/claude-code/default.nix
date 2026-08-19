@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
 
   ...
 }:
@@ -59,6 +60,11 @@ in
       enable = true;
       package = null;
       skills = mkIf (cfg.skills != { }) cfg.skills;
+
+      lspServers.nix = {
+        command = "${pkgs.nixd}/bin/nixd";
+        extensionToLanguage.".nix" = "nix";
+      };
     };
   };
 }

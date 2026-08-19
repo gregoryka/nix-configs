@@ -19,6 +19,7 @@ let
     nix-search-cli
     nix-tree
     nix-update
+    nixd
     nixpkgs-hammering
     nixpkgs-lint
     nixpkgs-review

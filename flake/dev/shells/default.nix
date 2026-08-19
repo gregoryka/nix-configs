@@ -8,6 +8,7 @@ let
   packages = with pkgs; [
     deadnix
     nh
+    nixd
     statix
     sops
   ];
