@@ -19,7 +19,7 @@ let
   # doesn't force building either output.
   mkSkillEntries = dir: lib.genAttrs pkgs.gregnix.qodo-cli-skills.skillNames (name: "${dir}/${name}");
 
-  needsWrapper = cfg.urlSopsFile != null || cfg.tokenRef != null || cfg.tokenSopsFile != null;
+  needsWrapper = cfg.sdkUrlSopsFile != null || cfg.tokenRef != null || cfg.tokenSopsFile != null;
 
   qodoWrapped = mkSecretsWrapper {
     inherit pkgs;
@@ -31,22 +31,18 @@ let
     };
 
     sopsEnv =
-      lib.optionalAttrs (cfg.urlSopsFile != null) (
-        let
-          url = {
-            sopsFile = cfg.urlSopsFile;
-            key = cfg.urlSopsKey;
-          };
-        in
-        {
-          # Both point at the same field: `resolveCredentials()` in
-          # qodo.mjs needs `QODO_BASE_URL` (paired with a token, for fully
-          # non-interactive use); `QODO_AUTH_URL` covers interactive
-          # `qodo login`/`setup` against the same self-hosted platform.
-          QODO_AUTH_URL = url;
-          QODO_BASE_URL = url;
-        }
-      )
+      lib.optionalAttrs (cfg.sdkUrlSopsFile != null) {
+        # `resolveCredentials()` in qodo.mjs pairs `QODO_BASE_URL` with a
+        # token for fully non-interactive use. This is the self-hosted
+        # platform's *SDK* endpoint -- a distinct host from the auth/login
+        # endpoint (see `resolveAuthUrl()`), which `qodo login` discovers
+        # for itself during the device-code handshake and isn't managed
+        # here.
+        QODO_BASE_URL = {
+          sopsFile = cfg.sdkUrlSopsFile;
+          key = cfg.sdkUrlSopsKey;
+        };
+      }
       // lib.optionalAttrs (cfg.tokenSopsFile != null) {
         QODO_API_KEY = {
           sopsFile = cfg.tokenSopsFile;
@@ -59,17 +55,18 @@ in
   options.gregnix.programs.terminal.tools.qodo = {
     enable = mkEnableOption "the Qodo CLI";
 
-    urlSopsFile = mkOpt (types.nullOr types.path) null ''
-      Path to a sops-encrypted file holding the self-hosted Qodo platform
-      URL (see `urlSopsKey`). Decrypted at invocation time by the
-      wrapper -- never rendered to disk -- and exported as both
-      `QODO_AUTH_URL` (interactive `qodo login`/`setup`) and
-      `QODO_BASE_URL` (paired with a token for fully non-interactive use,
-      per `resolveCredentials()` in qodo.mjs). Leave `null` for Qodo's
+    sdkUrlSopsFile = mkOpt (types.nullOr types.path) null ''
+      Path to a sops-encrypted file holding the self-hosted Qodo *SDK*
+      URL (see `sdkUrlSopsKey`) -- the endpoint `resolveCredentials()` in
+      qodo.mjs pairs with a token for fully non-interactive use. This is
+      not the auth/login endpoint: `qodo login`'s device-code handshake
+      discovers and stores that (and the SDK URL it's paired with) on its
+      own, so it isn't configured here. Decrypted at invocation time by
+      the wrapper -- never rendered to disk. Leave `null` for Qodo's
       public cloud.
     '';
 
-    urlSopsKey = mkOpt types.str "qodo_url" "Key within `urlSopsFile` holding the URL.";
+    sdkUrlSopsKey = mkOpt types.str "qodo_sdk_url" "Key within `sdkUrlSopsFile` holding the URL.";
 
     tokenRef = mkOpt (types.nullOr types.str) null ''
       1Password reference (e.g. `op://Vault/item/field`) for the Qodo API

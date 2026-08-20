@@ -75,8 +75,8 @@ in
     };
 
     gregnix.programs.terminal.tools.qodo = {
-      enable = false;
-      urlSopsFile = qodoSecretsFile;
+      enable = true;
+      sdkUrlSopsFile = qodoSecretsFile;
       tokenRef = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin "op://Employee/global-qodo-cli-key/credential";
     };
     gregnix.programs.terminal.tools.claude-code.enable = true;
